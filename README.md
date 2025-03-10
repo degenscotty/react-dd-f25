@@ -1,4 +1,4 @@
-![Alt text](img/image.png)
+![Alt text](./img/image.jpg)
 
 # Getting Started with Create React App
 
