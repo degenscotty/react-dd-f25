@@ -1,25 +1,39 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
-const App = () => {
-    // State to simulate behavior
-    const [message, setMessage] = useState("Welcome to the blockchain!")
-    const [count, setCount] = useState(3)
+export default function Home() {
+    const [message, setMessage] = useState("")
     const [newMessage, setNewMessage] = useState("")
+    const [count, setCount] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
+    const [isConnected, setIsConnected] = useState(false)
 
-    // Simulate transaction
+    // This simulates connecting to the blockchain and fetching initial data
+    useEffect(() => {
+        // Mock blockchain connection
+        const mockFetchData = () => {
+            setTimeout(() => {
+                setMessage("Welcome to the blockchain!")
+                setCount(3)
+                setIsConnected(true)
+            }, 1000)
+        }
+
+        mockFetchData()
+    }, [])
+
+    // This simulates sending a transaction to update the message
     const handleUpdate = () => {
         if (!newMessage.trim()) return
 
         setIsLoading(true)
 
-        // Simulate blockchain delay
+        // Simulate blockchain transaction
         setTimeout(() => {
             setMessage(newMessage)
-            setCount((prevCount) => prevCount + 1)
+            setCount((prevCount) => parseInt(prevCount) + 1)
             setNewMessage("")
             setIsLoading(false)
-        }, 1000)
+        }, 2000)
     }
 
     return (
@@ -30,7 +44,9 @@ const App = () => {
                 <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                     <div className="mb-3">
                         <span className="text-gray-500 text-sm">Current Message:</span>
-                        <p className="text-lg font-medium text-gray-800">{message}</p>
+                        <p className="text-lg font-medium text-gray-800">
+                            {message || "Loading..."}
+                        </p>
                     </div>
 
                     <div>
@@ -50,7 +66,7 @@ const App = () => {
 
                     <button
                         onClick={handleUpdate}
-                        disabled={isLoading}
+                        disabled={isLoading || !isConnected}
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     >
                         {isLoading ? "Processing..." : "Update Message"}
@@ -63,12 +79,22 @@ const App = () => {
                     </div>
                 )}
 
-                <div className="mt-6 text-xs text-gray-500">
-                    Connected to network: Local Anvil Chain
+                <div className="mt-6 text-xs text-gray-500 flex items-center">
+                    <div
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                            isConnected ? "bg-green-500" : "bg-red-500"
+                        }`}
+                    ></div>
+                    Status:{" "}
+                    {isConnected ? "Connected to Anvil Local Chain" : "Connecting to blockchain..."}
                 </div>
+
+                {isConnected && (
+                    <div className="mt-2 text-xs text-gray-400">
+                        Contract: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+                    </div>
+                )}
             </div>
         </div>
     )
 }
-
-export default App
