@@ -1,4 +1,7 @@
-![Alt text](./img/image.jpg)
+<div style="display: flex; justify-content: space-between;">
+  <img src="./image/light.jpg" width="48%" alt="Light Mode Screenshot">
+  <img src="./image/dark.jpg" width="48%" alt="Dark Mode Screenshot">
+</div>
 
 # Getting Started with Create React App
 
