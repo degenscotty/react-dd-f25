@@ -11,16 +11,33 @@ import { http, createConfig } from 'wagmi';
 import '@rainbow-me/rainbowkit/styles.css';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { metaMaskWallet, rabbyWallet } from '@rainbow-me/rainbowkit/wallets';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+
+// Custom wallet configuration to only show MetaMask and Rabby
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Select Wallet',
+    wallets: [
+      metaMaskWallet,
+      rabbyWallet,
+    ],
+  },
+], {
+  appName: 'DApp Demo',
+  projectId: process.env.REACT_APP_PROJECT_ID,
+});
 
 // Configure wagmi & RainbowKit
 const config = getDefaultConfig({
   appName: 'DApp Demo',
-  projectId: process.env.REACT_APP_PROJECT_ID, // Using project ID from .env
+  projectId: process.env.REACT_APP_PROJECT_ID,
   chains: [mainnet, sepolia],
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
   },
+  connectors,
 });
 
 // Create a query client
@@ -59,6 +76,10 @@ function RainbowKitThemeWrapper({ children }) {
       key={key} 
       theme={rainbowTheme} 
       coolMode
+      modalSize="compact"
+      showRecentTransactions={false}
+      disableConnectWallet={false}
+      includeWalletIds={['metaMask', 'rabby']}
     >
       {children}
     </RainbowKitProvider>
