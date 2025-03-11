@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { ThemeProvider, useTheme } from "./context/ThemeContext"
 import Navbar from "./components/Navbar"
+import { useAccount } from 'wagmi'
 
 function AppContent() {
     const { isDarkMode } = useTheme()
@@ -8,21 +9,24 @@ function AppContent() {
     const [newMessage, setNewMessage] = useState("")
     const [count, setCount] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
-    const [isConnected, setIsConnected] = useState(false)
+    
+    // Use wagmi's useAccount hook to check if wallet is connected
+    const { isConnected } = useAccount()
 
-    // This simulates connecting to the blockchain and fetching initial data
+    // This simulates fetching initial data when connected
     useEffect(() => {
         // Mock blockchain connection
-        const mockFetchData = () => {
-            setTimeout(() => {
-                setMessage("Welcome to the blockchain!")
-                setCount(3)
-                setIsConnected(true)
-            }, 1000)
-        }
+        if (isConnected) {
+            const mockFetchData = () => {
+                setTimeout(() => {
+                    setMessage("Welcome to the blockchain!")
+                    setCount(3)
+                }, 1000)
+            }
 
-        mockFetchData()
-    }, [])
+            mockFetchData()
+        }
+    }, [isConnected])
 
     // This simulates sending a transaction to update the message
     const handleUpdate = () => {
@@ -95,7 +99,7 @@ function AppContent() {
                             }`}
                         ></div>
                         Status:{" "}
-                        {isConnected ? "Connected to Anvil Local Chain" : "Connecting to blockchain..."}
+                        {isConnected ? "Connected to Blockchain" : "Not connected to blockchain"}
                     </div>
 
                     {isConnected && (
