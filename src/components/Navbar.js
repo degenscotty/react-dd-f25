@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { ethers } from 'ethers';
 
 export default function Navbar() {
     const { isDarkMode, toggleDarkMode } = useTheme();
