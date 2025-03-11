@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -15,8 +15,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 // Configure wagmi & RainbowKit
 const config = getDefaultConfig({
   appName: 'DApp Demo',
-  // TODO: Replace with your project ID from https://cloud.walletconnect.com
-  projectId: 'YOUR_PROJECT_ID', // Get one from https://cloud.walletconnect.com
+  projectId: process.env.REACT_APP_PROJECT_ID, // Using project ID from .env
   chains: [mainnet, sepolia],
   transports: {
     [mainnet.id]: http(),
@@ -31,9 +30,35 @@ const queryClient = new QueryClient();
 function RainbowKitThemeWrapper({ children }) {
   const { isDarkMode } = useTheme();
   
+  // Use console.log to verify theme changes are detected
+  useEffect(() => {
+    console.log('Theme changed:', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+  
+  // Force re-render of RainbowKitProvider when theme changes
+  const [key, setKey] = React.useState(0);
+  
+  // Update key when theme changes to force re-render
+  useEffect(() => {
+    setKey(prevKey => prevKey + 1);
+  }, [isDarkMode]);
+  
+  // Create theme objects outside of JSX for better control
+  const rainbowTheme = isDarkMode 
+    ? darkTheme({ 
+        accentColor: '#3b82f6',
+        borderRadius: 'medium'
+      }) 
+    : lightTheme({ 
+        accentColor: '#3b82f6',
+        borderRadius: 'medium'
+      });
+
   return (
     <RainbowKitProvider 
-      theme={isDarkMode ? darkTheme() : lightTheme()}
+      key={key} 
+      theme={rainbowTheme} 
+      coolMode
     >
       {children}
     </RainbowKitProvider>

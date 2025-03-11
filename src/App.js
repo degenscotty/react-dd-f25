@@ -1,46 +1,25 @@
-import React, { useState, useEffect } from "react"
-import { ThemeProvider, useTheme } from "./context/ThemeContext"
+import React, { useState } from "react"
+import { useTheme } from "./context/ThemeContext"
 import Navbar from "./components/Navbar"
 import { useAccount } from 'wagmi'
+import { useMessageContract } from "./hooks/useMessageContract"
+import { CONTRACT_ADDRESS } from "./contract/contractConfig"
 
 function AppContent() {
     const { isDarkMode } = useTheme()
-    const [message, setMessage] = useState("")
     const [newMessage, setNewMessage] = useState("")
-    const [count, setCount] = useState(0)
-    const [isLoading, setIsLoading] = useState(false)
     
     // Use wagmi's useAccount hook to check if wallet is connected
     const { isConnected } = useAccount()
 
-    // This simulates fetching initial data when connected
-    useEffect(() => {
-        // Mock blockchain connection
-        if (isConnected) {
-            const mockFetchData = () => {
-                setTimeout(() => {
-                    setMessage("Welcome to the blockchain!")
-                    setCount(3)
-                }, 1000)
-            }
+    // Use our contract hook instead of simulation
+    const { message, count, isLoading, updateMessage, isPending } = useMessageContract();
 
-            mockFetchData()
-        }
-    }, [isConnected])
-
-    // This simulates sending a transaction to update the message
+    // Handle the message update
     const handleUpdate = () => {
         if (!newMessage.trim()) return
-
-        setIsLoading(true)
-
-        // Simulate blockchain transaction
-        setTimeout(() => {
-            setMessage(newMessage)
-            setCount((prevCount) => parseInt(prevCount) + 1)
-            setNewMessage("")
-            setIsLoading(false)
-        }, 2000)
+        updateMessage(newMessage)
+        setNewMessage("")
     }
 
     return (
@@ -54,13 +33,15 @@ function AppContent() {
                         <div className="mb-3">
                             <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'} text-sm`}>Current Message:</span>
                             <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                                {message || "Loading..."}
+                                {isConnected ? (message || "Loading...") : "Connect wallet to view message"}
                             </p>
                         </div>
 
                         <div>
                             <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'} text-sm`}>Update Count:</span>
-                            <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>{count}</p>
+                            <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                                {isConnected ? count : "Connect wallet to view count"}
+                            </p>
                         </div>
                     </div>
 
@@ -82,11 +63,11 @@ function AppContent() {
                             disabled={isLoading || !isConnected}
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                         >
-                            {isLoading ? "Processing..." : "Update Message"}
+                            {isPending ? "Processing..." : "Update Message"}
                         </button>
                     </div>
 
-                    {isLoading && (
+                    {isPending && (
                         <div className={`mt-4 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Transaction in progress... waiting for confirmation
                         </div>
@@ -104,7 +85,7 @@ function AppContent() {
 
                     {isConnected && (
                         <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Contract: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+                            Contract: {CONTRACT_ADDRESS}
                         </div>
                     )}
                 </div>
@@ -113,8 +94,8 @@ function AppContent() {
     )
 }
 
-export default function App() {
-    return (
-        <AppContent />
-    )
+function App() {
+    return <AppContent />
 }
+
+export default App;
