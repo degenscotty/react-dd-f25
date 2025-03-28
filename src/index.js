@@ -7,37 +7,20 @@ import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowki
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider } from "wagmi"
 import { mainnet, sepolia } from "wagmi/chains"
-import { http, createConfig } from "wagmi"
+import { http } from "wagmi"
 import "@rainbow-me/rainbowkit/styles.css"
 import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { ThemeProvider, useTheme } from "./context/ThemeContext"
-import { metaMaskWallet, rabbyWallet } from "@rainbow-me/rainbowkit/wallets"
-import { connectorsForWallets } from "@rainbow-me/rainbowkit"
-
-// Custom wallet configuration to only show MetaMask and Rabby
-const connectors = connectorsForWallets(
-    [
-        {
-            groupName: "Select Wallet",
-            wallets: [metaMaskWallet, rabbyWallet],
-        },
-    ],
-    {
-        appName: "DApp Demo",
-        projectId: process.env.REACT_APP_PROJECT_ID,
-    }
-)
 
 // Configure wagmi & RainbowKit
 const config = getDefaultConfig({
     appName: "DApp Demo",
-    projectId: process.env.REACT_APP_PROJECT_ID,
+    projectId: "Project ID",
     chains: [mainnet, sepolia],
     transports: {
         [mainnet.id]: http(),
         [sepolia.id]: http(),
     },
-    connectors,
 })
 
 // Create a query client
